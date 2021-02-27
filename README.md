@@ -6,4 +6,4 @@ https://colab.research.google.com/drive/1Ay5zyYu6U8PKv3mdAcs0BsqJdP841ei1?usp=sh
 
 Link al colab red neuronal recursiva (con la normalización por slot):
 
-https://colab.research.google.com/drive/1AWPOgHhYRFTyQ-7jRJY0G8pwEI43KTzy?usp=sharing
+https://colab.research.google.com/drive/1pHmTCb3NOx5Oxg8zhiFOTBxUi5H5LmJ0?usp=sharing
