@@ -10,4 +10,4 @@ https://colab.research.google.com/drive/1pHmTCb3NOx5Oxg8zhiFOTBxUi5H5LmJ0?usp=sh
 
 Link al colab red neuronal LSTM (con la normalización por slot):
 
-https://colab.research.google.com/drive/1-p5XC638Lg5o8AYz-lbzZQ1uuP4Uy-kb?usp=sharing
+https://colab.research.google.com/drive/1wBfnWhEINsM-mzniFFI95U_yVLeIVhF1?usp=sharing
