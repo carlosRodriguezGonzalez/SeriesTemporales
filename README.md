@@ -11,3 +11,8 @@ https://colab.research.google.com/drive/1pHmTCb3NOx5Oxg8zhiFOTBxUi5H5LmJ0?usp=sh
 Link al colab red neuronal LSTM (con la normalización por slot, este hay mas cambios que en la recursiva se actualizara posteriormente):
 
 https://colab.research.google.com/drive/1-p5XC638Lg5o8AYz-lbzZQ1uuP4Uy-kb?usp=sharing
+
+
+Link al colab de visualizaciones:
+
+https://colab.research.google.com/drive/1miD8JwGqcH18uTcTvlZGLQOuLSAgg4Rr?usp=sharing
