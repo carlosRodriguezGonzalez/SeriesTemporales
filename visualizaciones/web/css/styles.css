@@ -10,6 +10,10 @@ p{
     margin: 0;
 }
 
+.marginTop{
+    margin-top: 1vh;
+}
+
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
@@ -101,14 +105,19 @@ select.flat-select {
 .compra_venta{
     background: #f8f9fa;
     margin-top: 1vh;
+    padding: 24px;
+    min-height: 350px;
 }
 
 .compra_venta__buttons{
     margin-top: 1vh;
 
     display: flex;
+
     justify-content: center;
     height: 50px;
+
+
 }
 
 .css-1ruuqxh {

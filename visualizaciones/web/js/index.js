@@ -1,3 +1,9 @@
+var df;
+
+d3.csv("assets/SAN_v1.csv", function (data) {
+  df = data;
+});
+
 var options = {
   series: [
     {
