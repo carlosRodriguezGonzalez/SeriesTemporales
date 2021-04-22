@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, Response
 from flask_jsonpify import jsonpify
 import os
 from scrapperDatasets import scrapperDatasets
@@ -31,7 +31,7 @@ def getNewBusiness(empresa):
 
 @app.route('/empresas/<empresa>')
 def getDataFromEmpresa(empresa):
-    fields = ['Date', "high", "low", "open", "close", "volume"]
+    fields = ['Date', "high", "low", "open", "close", "volume", "cci"]
 
     data = pd.read_csv(f'data/{empresa}.csv', usecols=fields)
 
@@ -41,3 +41,16 @@ def getDataFromEmpresa(empresa):
     df_list.insert(0, head)
 
     return jsonify(df_list)
+
+
+@app.route('/empresas/<empresa>/CSV')
+def getDataFromEmpresaCSV(empresa):
+    fields = ['Date', "high", "low", "open", "close", "volume"]
+
+    data = pd.read_csv(f'data/{empresa}.csv', usecols=fields)
+
+    return Response(
+        data.to_csv(),
+        mimetype="text/csv",
+        headers={"Content-disposition":
+                 "attachment; filename=data.csv"})
