@@ -16,3 +16,7 @@ https://colab.research.google.com/drive/1-p5XC638Lg5o8AYz-lbzZQ1uuP4Uy-kb?usp=sh
 Link al colab de visualizaciones:
 
 https://colab.research.google.com/drive/1miD8JwGqcH18uTcTvlZGLQOuLSAgg4Rr?usp=sharing
+
+Actualización hecha con pablo lstm:
+
+https://colab.research.google.com/drive/15WpZJtAvCqIcst8iAJf196hVH9sQE00L?usp=sharing
