@@ -10,9 +10,9 @@ let volumeIndex;
 let cciIndex;
 
 const init = function(e) {
-    empresa = localStorage.getItem("empresaMin");
+    empresa = localStorage.getItem("ticker");
     nombre = localStorage.getItem("nombreEmpresa")
-    document.getElementById("nombreEmpresa").innerHTML = nombre +"("+empresa+")";
+    document.getElementById("nombreEmpresa").innerHTML = nombre;
     getData();
 }
 const getData = async () => {
