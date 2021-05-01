@@ -190,3 +190,17 @@ select.flat-select {
     margin: 0px;
     min-width: 0px;
 }
+
+
+.btn-info {
+    background-color: #f0ebcc!important;
+}
+.btn-info:hover {
+    background-color: #8fd9a8!important;
+}
+.btn-info:active{
+    background-color: #28b5b5!important;
+}
+btn-info:visited {
+    background-color: #4b778d!important;
+}

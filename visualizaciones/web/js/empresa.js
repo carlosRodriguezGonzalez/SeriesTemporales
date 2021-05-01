@@ -64,68 +64,153 @@ const renderChart = (data) => {
     const dataLine = [];
     const dataCandle = [];
     const dataCci = [];
-    let minData = [];
 
-    let inicio = data.length-1;
-    let finMes = data.length-30;
-
-    for(let i=0; inicio > finMes; inicio--,i++){
-        minData[i] = data[inicio];
-    }
-
-console.log(minData);
+    let minData = setMaxDatos(30,data);
 
     minData.forEach((x) => {
         //
         const tempLine = {};
         tempLine.x = new Date(x[dateIndex]).getTime();
-        tempLine.y = [x[closeIndex]];
+        tempLine.y = [redondear(x[closeIndex],3)];
         const tempCandle = {};
         tempCandle.x = new Date(x[dateIndex]).getTime();
-        tempCandle.y = [x[openIndex], x[highIndex], x[lowIndex], x[closeIndex]];
+        tempCandle.y = [redondear(x[openIndex],3), redondear(x[highIndex],3), redondear(x[lowIndex],3), redondear(x[closeIndex],3)];
 
         const tempCCI = {};
         tempCCI.x = new Date(x[dateIndex]).getTime();
-        tempCCI.y = [x[cciIndex]];
+        tempCCI.y = [redondear(x[cciIndex],3)];
         dataCci.push(tempCCI);
 
         dataLine.push(tempLine);
         dataCandle.push(tempCandle);
     });
 
-    var options3 = {
+
+    var optionsCandle = {
         series: [
-            {
-                data: dataCandle,
-            },
-        ],
+        {
+            data: dataCandle,
+        },
+    ],
         chart: {
-            type: "candlestick",
+        type: "candlestick",
             height: 290,
             id: "candles",
             toolbar: {
-                autoSelected: "pan",
+            autoSelected: "pan",
                 show: false,
-            },
-            zoom: {
-                enabled: false,
+        },
+        zoom: {
+            enabled: false,
+        },
+    },
+    plotOptions: {
+        candlestick: {
+            colors: {
+                upward: "#02c076",
+                    downward: "#f84960",
             },
         },
-        plotOptions: {
-            candlestick: {
-                colors: {
-                    upward: "#02c076",
-                    downward: "#f84960",
+    },
+    xaxis: {
+        type: "datetime",
+    },
+};
+
+    var chartCandle = new ApexCharts(document.querySelector("#chart-candlestick"), optionsCandle);
+    chartCandle.render();
+
+    xmin = minData[0][0];
+    console.log(xmin)
+    xmax = minData[minData.length-1][0];
+    console.log(xmax)
+
+    var optionsChartBar = {
+        series: [
+            {
+                name: "volume",
+                data: dataCci,
+            },
+        ],
+        chart: {
+            height: 160,
+            type: "bar",
+            brush: {
+                enabled: true,
+                target: "candles",
+            },
+            selection: {
+                enabled: true,
+                xaxis: {
+                    min: new Date(xmin).getTime(),
+                    max: new Date(xmax).getTime(),
+                },
+                fill: {
+                    color: "#ccc",
+                    opacity: 0.4,
+                },
+                stroke: {
+                    color: "#0D47A1",
                 },
             },
         },
+        dataLabels: {
+            enabled: false,
+        },
+        plotOptions: {
+            bar: {
+                columnWidth: "80%",
+                colors: {
+                    ranges: [
+                        {
+                            from: -1000,
+                            to: 0,
+                            color: "#f84960",
+                        },
+                        {
+                            from: 1,
+                            to: 10000,
+                            color: "#02c076",
+                        },
+                    ],
+                },
+            },
+        },
+        stroke: {
+            width: 0,
+        },
         xaxis: {
             type: "datetime",
+            axisBorder: {
+                offsetX: 13,
+            },
+        },
+        yaxis: {
+            labels: {
+                show: false,
+            },
         },
     };
-    var chart = new ApexCharts(document.querySelector("#chart-candlestick"), options3);
-    chart.render();
+
+    var chartBar = new ApexCharts(document.querySelector("#chart-bar"), optionsChartBar);
+    chartBar.render();
+
 }
+
+const setMaxDatos = (max, data) => {
+
+    // max puede ser: 1 dia; 5 dias; 30 dias; 60 dias; 90 dias; 365 dias;
+    let minData = [];
+    let inicio = data.length-1;
+    let finMes = data.length-max;
+
+    for(let i=0; inicio > finMes; inicio--,i++){
+        minData[i] = data[inicio];
+    }
+    return minData;
+}
+
+
 
 const redondear = (valorRaw, indice) => {
     let valor;
