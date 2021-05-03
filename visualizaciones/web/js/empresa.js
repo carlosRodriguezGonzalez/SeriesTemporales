@@ -1,4 +1,3 @@
-
 let empresa;
 let nombre;
 let dateIndex;
@@ -13,10 +12,11 @@ const dataLine = [];
 const dataCandle = [];
 const dataCci = [];
 
-const init = function(e) {
+const init = async function() {
     empresa = localStorage.getItem("ticker");
     nombre = localStorage.getItem("nombreEmpresa")
     document.getElementById("nombreEmpresa").innerHTML = nombre;
+
 
     let btn_1d = document.getElementById("btn_1d");
     let btn_5d = document.getElementById("btn_5d");
@@ -61,7 +61,7 @@ const init = function(e) {
 
         });
 
-    getData();
+    await getData();
 }
 
 const setValoresInicio = (data) => {
@@ -96,6 +96,9 @@ document.getElementById("precioCambio").innerHTML = precioCambio;
 
 const formatData = (data) =>{
 
+    dataCci.length = 0;
+    dataCandle.length = 0;
+
     data.forEach((x) => {
         //
         const tempLine = {};
@@ -117,6 +120,9 @@ const formatData = (data) =>{
 
 const renderChart = (data) => {
 
+    let xMin;
+    let xMax;
+
     var optionsCandle = {
        series: [
        {
@@ -128,10 +134,6 @@ const renderChart = (data) => {
            height: 290,
            id: "candles",
            toolbar: {
-           autoSelected: "pan",
-               show: false,
-       },
-           toolbar: {
                show: true,
                offsetX: 0,
                offsetY: 0,
@@ -142,7 +144,7 @@ const renderChart = (data) => {
                    zoomin: true,
                    zoomout: true,
                    pan: true,
-                   reset: true | '<img src="/static/icons/reset.png" width="20">',
+                   reset: true,
                    customIcons: []
                },
                export: {
@@ -180,9 +182,9 @@ const renderChart = (data) => {
 
     var chartCandle = new ApexCharts(document.querySelector("#chart-candlestick"), optionsCandle);
     chartCandle.render();
-    console.log(data);
-    xmin = data[0][0];
-    xmax = data[data.length-1][0];
+
+    xMin = data[0][0];
+    xMax = data[data.length-1][0];
 
     var optionsChartBar = {
        series: [
@@ -195,14 +197,14 @@ const renderChart = (data) => {
            height: 160,
            type: "bar",
            brush: {
-               enabled: true,
+               enabled: false,
                target: "candles",
            },
            selection: {
                enabled: true,
                xaxis: {
-                   min: new Date(xmin).getTime(),
-                   max: new Date(xmax).getTime(),
+                   min: new Date(xMin-1).getTime(),
+                   max: new Date(xMax+1).getTime(),
                },
                fill: {
                    color: "#ccc",
@@ -256,17 +258,21 @@ const renderChart = (data) => {
 
 }
 
-const setMaxDatos = (max, data) => {
+const setMaxDatos = (max) => {
 
 // max puede ser: 1 dia; 5 dias; 30 dias; 60 dias; 90 dias; 365 dias;
-let minData = [];
+let data = [];
+let headers = ["Date","high","low","open","close","volume","cci"];
+data.push(headers);
+
 let inicio = dataValues.length-1;
 let finMes = dataValues.length-max;
 
-for(let i=0; inicio > finMes; inicio--,i++){
-   minData[i] = dataValues[inicio];
+for(; inicio > finMes; inicio--){
+   data.push(dataValues[inicio]);
 }
-return minData;
+console.log(data)
+return data;
 }
 
 const redondear = (valorRaw, indice) => {
@@ -277,7 +283,7 @@ return valor;
 }
 
 const newEmpresa = () => {
-$.get("http://127.0.0.1:5000/data/"+empresa, function (data) {
+$.get("http://127.0.0.1:5000/data/"+empresa, function () {
   getData();
 });
 }
@@ -288,8 +294,10 @@ const getData = async () => {
         type: "GET",
         success: function(data){
             dataValues = data;
-            setValoresInicio(dataValues);
-            renderChart(dataValues);
+            let minData = setMaxDatos(30);
+            setValoresInicio(minData);
+            formatData(minData);
+            renderChart(minData);
         },
         error: function(data){
             if(data.status === 500){
@@ -300,5 +308,5 @@ const getData = async () => {
 }
 
 document.addEventListener('DOMContentLoaded', function (){
-init();
+    init();
 });
