@@ -2,11 +2,12 @@ from flask import Flask, jsonify, Response
 from flask_jsonpify import jsonpify
 import os
 from scrapperDatasets import scrapperDatasets
+from flask_cors import CORS
 import pandas as pd
 
+
 app = Flask(__name__)
-
-
+CORS(app)
 def cleanFileName(s):
     return s.split('.')[0]
 

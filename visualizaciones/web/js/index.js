@@ -112,6 +112,7 @@ var chartBar = new ApexCharts(document.querySelector("#chart-bar"), optionsBar);
 chartBar.render();
 
 var options2 = {
+
   series: [
     {
       name: "candle",
@@ -392,7 +393,7 @@ var options2 = {
 };
 
 const getData = () => {
-  $.get("http://127.0.0.1:5000/empresas/SAN", function (data) {
+  $.get("http://127.0.0.1:5000/empresas/SAN.MC", function (data) {
     const rawData = data;
 
     const headers = rawData.shift();
@@ -572,4 +573,4 @@ const getData = () => {
     var chart4 = new ApexCharts(document.querySelector("#chart4"), options4);
     chart4.render();
   });
-};
+}; // fin get data
