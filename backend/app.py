@@ -1,10 +1,13 @@
 from flask import Flask, jsonify, Response
 from flask_jsonpify import jsonpify
 import os
+import datetime
 from scrapperDatasets import scrapperDatasets
 import pandas as pd
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 
 def cleanFileName(s):
@@ -38,6 +41,12 @@ def getDataFromEmpresa(empresa):
     df_list = data.values.tolist()
 
     head = list(data.columns)
+
+    if head[0] != datetime.datetime.now():
+        os.remove(f'data/{empresa}.csv')
+        getNewBusiness(empresa)
+        return
+
     df_list.insert(0, head)
 
     return jsonify(df_list)
@@ -53,4 +62,4 @@ def getDataFromEmpresaCSV(empresa):
         data.to_csv(),
         mimetype="text/csv",
         headers={"Content-disposition":
-                 "attachment; filename=data.csv"})
+                     "attachment; filename=data.csv"})
