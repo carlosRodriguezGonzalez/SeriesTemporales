@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, Response
 from flask_jsonpify import jsonpify
 import os
+import datetime
 from scrapperDatasets import scrapperDatasets
 from flask_cors import CORS
 import pandas as pd
@@ -39,6 +40,10 @@ def getDataFromEmpresa(empresa):
     df_list = data.values.tolist()
 
     head = list(data.columns)
+
+    if head[0] != datetime.datetime.now():
+        getNewBusiness(empresa)
+
     df_list.insert(0, head)
 
     return jsonify(df_list)
