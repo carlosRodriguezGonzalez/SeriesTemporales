@@ -10,7 +10,7 @@ let cciIndex;
 let dataValues;
 const dataLine = [];
 const dataCandle = [];
-const dataCci = [];
+const dataVolume = [];
 
 const init = async function() {
     empresa = localStorage.getItem("ticker");
@@ -26,7 +26,7 @@ const init = async function() {
     let btn_90d = document.getElementById("btn_90d");
 
         btn_1d.addEventListener('click', function (){
-            let minData = setMaxDatos(2);
+            let minData = setMaxDatos(1);
             formatData(minData);
             renderChart(minData);
         });
@@ -96,7 +96,7 @@ document.getElementById("precioCambio").innerHTML = precioCambio;
 
 const formatData = (data) =>{
 
-    dataCci.length = 0;
+    dataVolume.length = 0;
     dataCandle.length = 0;
 
     data.forEach((x) => {
@@ -108,10 +108,10 @@ const formatData = (data) =>{
         tempCandle.x = new Date(x[dateIndex]).getTime();
         tempCandle.y = [redondear(x[openIndex],3), redondear(x[highIndex],3), redondear(x[lowIndex],3), redondear(x[closeIndex],3)];
 
-        const tempCCI = {};
-        tempCCI.x = new Date(x[dateIndex]).getTime();
-        tempCCI.y = [redondear(x[cciIndex],3)];
-        dataCci.push(tempCCI);
+        const tempVolume = {};
+        tempVolume.x = new Date(x[dateIndex]).getTime();
+        tempVolume.y = [redondear(x[volumeIndex],3)];
+        dataVolume.push(tempVolume);
 
         dataLine.push(tempLine);
         dataCandle.push(tempCandle);
@@ -131,7 +131,7 @@ const renderChart = (data) => {
     ],
        chart: {
        type: "candlestick",
-           height: 290,
+           height: 300,
            id: "candles",
            toolbar: {
                show: true,
@@ -186,11 +186,14 @@ const renderChart = (data) => {
     xMin = data[0][0];
     xMax = data[data.length-1][0];
 
+    console.log(xMin)
+    console.log(xMax)
+
     var optionsChartBar = {
        series: [
            {
                name: "volume",
-               data: dataCci,
+               data: dataVolume,
            },
        ],
        chart: {
@@ -260,26 +263,32 @@ const renderChart = (data) => {
 
 const setMaxDatos = (max) => {
 
-// max puede ser: 1 dia; 5 dias; 30 dias; 60 dias; 90 dias; 365 dias;
-let data = [];
-let headers = ["Date","high","low","open","close","volume","cci"];
-data.push(headers);
+    // max puede ser: 1 dia; 5 dias; 30 dias; 60 dias; 90 dias; 365 dias;
+    let data = [];
+    let headers = ["Date","high","low","open","close","volume","cci"];
+    data.push(headers);
 
-let inicio = dataValues.length-1;
-let finMes = dataValues.length-max;
+    let inicio = dataValues.length-1;
+    let finMes = dataValues.length-max;
 
-for(; inicio > finMes; inicio--){
-   data.push(dataValues[inicio]);
-}
-console.log(data)
-return data;
+    if(max === 1){
+        data.push(dataValues[inicio])
+    }else {
+        for (; inicio > finMes; inicio--) {
+            data.push(dataValues[inicio]);
+        }
+    }
+
+    return data;
 }
 
 const redondear = (valorRaw, indice) => {
-let valor;
-valorRaw = Math.floor(valorRaw * 100) / 100;
-valor = valorRaw.toFixed(indice);
-return valor;
+
+    let valor;
+    valorRaw = Math.floor(valorRaw * 100) / 100;
+    valor = valorRaw.toFixed(indice);
+
+    return valor;
 }
 
 const newEmpresa = () => {
@@ -295,7 +304,7 @@ const getData = async () => {
         success: function(data){
             dataValues = data;
             let minData = setMaxDatos(30);
-            setValoresInicio(minData);
+            setValoresInicio(dataValues);
             formatData(minData);
             renderChart(minData);
         },
