@@ -44,17 +44,18 @@ def getDataFromEmpresa(empresa):
     head = list(data.columns)
     print(df_list[len(df_list)-1][0] + " --  " + str(datetime.datetime.now().strftime("%Y-%m-%d")))
 
-    print("day:" + str(datetime.datetime.now().day))
     #currentTime = str(datetime.datetime.now().strftime("%Y-%m-%d"))
-    currentDay = datetime.datetime.now().day
+    currentTime = str(datetime.datetime.now().strftime("%Y-%m-%d"))
+    currentDay = currentTime[8:10]
+    print(currentDay)
+
     dfTime = df_list[len(df_list)-1][0]
     dfDay = dfTime[8:10]
+    print(dfDay)
 
-    print(int(dfDay) != currentDay-1)
-    print(int(dfDay) != currentDay-2)
     # hay que sacar los findes de semana --> problema para los dias de fiesta en general es un problema lo de tenerlos actualizados
     # por ahora depende de que el cliente acceda a la empresa para que se actualicen
-    if int(dfDay) != currentDay-1 and int(dfDay) != currentDay-2:
+    if currentDay != dfDay:
         print(f'descargando nueva version de {empresa}')
         os.remove(f'data/{empresa}.csv')
         getNewBusiness(empresa)
