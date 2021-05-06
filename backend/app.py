@@ -4,7 +4,6 @@ import os
 import datetime
 from scrapperDatasets import scrapperDatasets
 from model import Model
-from flask_cors import CORS
 import pandas as pd
 import numpy as np
 from flask_cors import CORS
