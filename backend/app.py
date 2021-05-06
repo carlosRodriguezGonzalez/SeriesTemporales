@@ -1,16 +1,19 @@
 from flask import Flask, jsonify, Response
 from flask_jsonpify import jsonpify
 import os
+import datetime
 from scrapperDatasets import scrapperDatasets
 from model import Model
+from flask_cors import CORS
 import pandas as pd
 import numpy as np
 
 
 app = Flask(__name__)
 
-sanModel = Model("./data/models/model.h5","./data/SAN.csv")
+CORS(app)
 
+sanModel = Model("./data/models/model.h5","./data/SAN.csv")
 
 def cleanFileName(s):
     return s.split('.')[0]
@@ -43,6 +46,10 @@ def getDataFromEmpresa(empresa):
     df_list = data.values.tolist()
 
     head = list(data.columns)
+
+    if head[0] != datetime.datetime.now():
+        getNewBusiness(empresa)
+
     df_list.insert(0, head)
 
     return jsonify(df_list)
