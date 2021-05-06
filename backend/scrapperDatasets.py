@@ -6,6 +6,7 @@ from stockstats import StockDataFrame
 class scrapperDatasets:
     @classmethod
     def getData(cls, empresa):
+
         stocks = pdr.get_data_yahoo(empresa,
                                     start=datetime.datetime(2006, 10, 1),
                                     end=datetime.datetime.now())

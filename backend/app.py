@@ -3,13 +3,19 @@ from flask_jsonpify import jsonpify
 import os
 import datetime
 from scrapperDatasets import scrapperDatasets
+from model import Model
+from flask_cors import CORS
 import pandas as pd
+import numpy as np
 from flask_cors import CORS
 
 
 app = Flask(__name__)
 CORS(app)
 
+CORS(app)
+
+sanModel = Model("./data/models/model.h5","./data/SAN.csv")
 
 def cleanFileName(s):
     return s.split('.')[0]
@@ -42,9 +48,7 @@ def getDataFromEmpresa(empresa):
     df_list = data.values.tolist()
 
     head = list(data.columns)
-    print(df_list[len(df_list)-1][0] + " --  " + str(datetime.datetime.now().strftime("%Y-%m-%d")))
 
-    #currentTime = str(datetime.datetime.now().strftime("%Y-%m-%d"))
     currentTime = str(datetime.datetime.now().strftime("%Y-%m-%d"))
     currentDay = currentTime[8:10]
     print(currentDay)
@@ -61,6 +65,7 @@ def getDataFromEmpresa(empresa):
         getNewBusiness(empresa)
         return
 
+
     df_list.insert(0, head)
 
     return jsonify(df_list)
@@ -76,4 +81,10 @@ def getDataFromEmpresaCSV(empresa):
         data.to_csv(),
         mimetype="text/csv",
         headers={"Content-disposition":
-                     "attachment; filename=data.csv"})
+                 "attachment; filename=data.csv"})
+
+@app.route('/pruebi')
+def makePrediction():
+    
+    return np.array_str(sanModel.getPrediction(100))
+
