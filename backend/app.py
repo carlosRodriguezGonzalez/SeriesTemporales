@@ -1,10 +1,14 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, Response
 from flask_jsonpify import jsonpify
 import os
+import datetime
 from scrapperDatasets import scrapperDatasets
 import pandas as pd
+from flask_cors import CORS
+
 
 app = Flask(__name__)
+CORS(app)
 
 
 def cleanFileName(s):
@@ -31,13 +35,45 @@ def getNewBusiness(empresa):
 
 @app.route('/empresas/<empresa>')
 def getDataFromEmpresa(empresa):
-    fields = ['Date', "high", "low", "open", "close", "volume"]
+    fields = ['Date', "high", "low", "open", "close", "volume", "cci"]
 
     data = pd.read_csv(f'data/{empresa}.csv', usecols=fields)
 
     df_list = data.values.tolist()
 
     head = list(data.columns)
+    print(df_list[len(df_list)-1][0] + " --  " + str(datetime.datetime.now().strftime("%Y-%m-%d")))
+
+    #currentTime = str(datetime.datetime.now().strftime("%Y-%m-%d"))
+    currentTime = str(datetime.datetime.now().strftime("%Y-%m-%d"))
+    currentDay = currentTime[8:10]
+    print(currentDay)
+
+    dfTime = df_list[len(df_list)-1][0]
+    dfDay = dfTime[8:10]
+    print(dfDay)
+
+    # hay que sacar los findes de semana --> problema para los dias de fiesta en general es un problema lo de tenerlos actualizados
+    # por ahora depende de que el cliente acceda a la empresa para que se actualicen
+    if currentDay != dfDay:
+        print(f'descargando nueva version de {empresa}')
+        os.remove(f'data/{empresa}.csv')
+        getNewBusiness(empresa)
+        return
+
     df_list.insert(0, head)
 
     return jsonify(df_list)
+
+
+@app.route('/empresas/<empresa>/CSV')
+def getDataFromEmpresaCSV(empresa):
+    fields = ['Date', "high", "low", "open", "close", "volume"]
+
+    data = pd.read_csv(f'data/{empresa}.csv', usecols=fields)
+
+    return Response(
+        data.to_csv(),
+        mimetype="text/csv",
+        headers={"Content-disposition":
+                     "attachment; filename=data.csv"})
