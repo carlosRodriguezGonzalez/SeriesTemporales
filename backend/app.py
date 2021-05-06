@@ -2,9 +2,14 @@ from flask import Flask, jsonify, Response
 from flask_jsonpify import jsonpify
 import os
 from scrapperDatasets import scrapperDatasets
+from model import Model
 import pandas as pd
+import numpy as np
+
 
 app = Flask(__name__)
+
+sanModel = Model("./data/models/model.h5","./data/SAN.csv")
 
 
 def cleanFileName(s):
@@ -54,3 +59,8 @@ def getDataFromEmpresaCSV(empresa):
         mimetype="text/csv",
         headers={"Content-disposition":
                  "attachment; filename=data.csv"})
+
+@app.route('/pruebi')
+def makePrediction():
+    
+    return np.array_str(sanModel.getPrediction(100))
