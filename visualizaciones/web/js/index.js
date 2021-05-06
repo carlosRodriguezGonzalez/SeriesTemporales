@@ -35,11 +35,8 @@ var options = {
   },
 };
 
-var chart = new ApexCharts(
-  document.querySelector("#chart-candlestick"),
-  options
-);
-chart.render();
+//var chart = new ApexCharts(document.querySelector("#chart-candlestick"),options);
+//chart.render();
 
 var optionsBar = {
   series: [
@@ -108,8 +105,8 @@ var optionsBar = {
   },
 };
 
-var chartBar = new ApexCharts(document.querySelector("#chart-bar"), optionsBar);
-chartBar.render();
+//var chartBar = new ApexCharts(document.querySelector("#chart-bar"), optionsBar);
+//chartBar.render();
 
 var options2 = {
 

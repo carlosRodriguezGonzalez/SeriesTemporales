@@ -7,9 +7,11 @@ from model import Model
 from flask_cors import CORS
 import pandas as pd
 import numpy as np
+from flask_cors import CORS
 
 
 app = Flask(__name__)
+CORS(app)
 
 CORS(app)
 
@@ -47,8 +49,22 @@ def getDataFromEmpresa(empresa):
 
     head = list(data.columns)
 
-    if head[0] != datetime.datetime.now():
+    currentTime = str(datetime.datetime.now().strftime("%Y-%m-%d"))
+    currentDay = currentTime[8:10]
+    print(currentDay)
+
+    dfTime = df_list[len(df_list)-1][0]
+    dfDay = dfTime[8:10]
+    print(dfDay)
+
+    # hay que sacar los findes de semana --> problema para los dias de fiesta en general es un problema lo de tenerlos actualizados
+    # por ahora depende de que el cliente acceda a la empresa para que se actualicen
+    if currentDay != dfDay:
+        print(f'descargando nueva version de {empresa}')
+        os.remove(f'data/{empresa}.csv')
         getNewBusiness(empresa)
+        return
+
 
     df_list.insert(0, head)
 
@@ -71,3 +87,4 @@ def getDataFromEmpresaCSV(empresa):
 def makePrediction():
     
     return np.array_str(sanModel.getPrediction(100))
+
