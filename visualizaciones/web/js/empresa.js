@@ -30,7 +30,9 @@ const init = async function() {
     let btn_30d = document.getElementById("btn_30d");
     let btn_60d = document.getElementById("btn_60d");
     let btn_90d = document.getElementById("btn_90d");
-
+    let btn_1a = document.getElementById("btn_1a");
+    let btn_5a = document.getElementById("btn_5a");
+    let btn_max = document.getElementById("btn_max");
     btn_1d.addEventListener('click', function (){
         let minData = setMaxDatos(1);
         formatData(minData);
@@ -46,25 +48,36 @@ const init = async function() {
         let minData = setMaxDatos(14);
         formatData(minData);
         renderChart(minData);
-
     });
     btn_30d.addEventListener('click', function (){
         let minData = setMaxDatos(30);
         formatData(minData);
         renderChart(minData);
-
     });
     btn_60d.addEventListener('click', function (){
         let minData = setMaxDatos(60);
         formatData(minData);
         renderChart(minData);
-
     });
     btn_90d.addEventListener('click', function (){
         let minData = setMaxDatos(90);
         formatData(minData);
         renderChart(minData);
-
+    });
+    btn_1a.addEventListener('click', function (){
+        let minData = setMaxDatos(365);
+        formatData(minData);
+        renderLine();
+    });
+    btn_5a.addEventListener('click', function (){
+        let minData = setMaxDatos(1826);
+        formatData(minData);
+        renderLine();
+    });
+    btn_max.addEventListener('click', function (){
+        let minData = setMaxDatos(0);
+        formatData(minData);
+        renderLine();
     });
 
     await getData();
@@ -136,12 +149,59 @@ const formatData = (data) =>{
     });
 }
 
+const renderLine = () => {
+
+    let chartOld = document.getElementById("chart-candlestick");
+    let chartNew = document.getElementById("chart-line");
+    chartOld.hidden = true;
+    chartNew.hidden = false;
+
+
+    var optionsLine = {
+        series: [
+            {
+                data: dataLine,
+            },
+        ],
+        chart: {
+            animations: {
+                enabled: false,
+            },
+        },
+        xaxis: {
+            type: "datetime",
+        },
+        tooltip: {
+            shared: true,
+            custom: function ({seriesIndex, dataPointIndex, w}) {
+                return (
+                    '<div class="arrow_box">' +
+                    "<span>" + "Cierre: " + w.globals.series[seriesIndex][dataPointIndex] + "</span>" +
+                    "</div>"
+                )
+            },
+        },
+        stroke: {
+            width: 1.25,
+            colors: ["#f00"],
+        },
+    };
+
+    var chartLine = new ApexCharts(document.querySelector("#chart-line"), optionsLine);
+    chartLine.render();
+}
+
 const renderChart = (data) => {
+    let chartOld = document.getElementById("chart-line");
+    let chartNew = document.getElementById("chart-candlestick");
+    chartOld.hidden = true;
+    chartNew.hidden = false;
+
 
     let xMin;
     let xMax;
 
-    // TODO esta grafica muestra la media movil pero habria que configurarla + varios bugs de la libreria, por ahora no se utiliza
+    // TODO: esta grafica muestra la media movil pero habria que configurarla + varios bugs de la libreria; por ahora no se utiliza
     var optionsCandleIndicator = {
         series: [{
             name: 'SMA',
@@ -300,27 +360,30 @@ const renderChart = (data) => {
     var chartBar = new ApexCharts(document.querySelector("#chart-bar"), optionsChartBar);
     chartBar.render();
 
+
 }
 
 const setMaxDatos = (max) => {
 
     // max puede ser: 1 dia; 5 dias; 30 dias; 60 dias; 90 dias; *365 dias;
-
     let data = [];
     let headers = ["Date","high","low","open","close","volume","open_2_sma"];
     data.push(headers);
 
     let inicio = dataValues.length-1;
-    let finMes = dataValues.length-max;
+    let finMes = inicio-max;
 
     if(max === 1){
         data.push(dataValues[inicio])
     }else {
+        if(max === 0){
+            finMes = 0;
+        }
         for (; inicio > finMes; inicio--) {
             data.push(dataValues[inicio]);
         }
     }
-
+    console.log(data)
     return data;
 }
 
@@ -359,6 +422,7 @@ const getData = async () => {
 }
 
 document.addEventListener('DOMContentLoaded', function (){
+
     optionsCandle = {
         series: [],
         chart: {
@@ -411,7 +475,6 @@ document.addEventListener('DOMContentLoaded', function (){
             text: 'Cargando...'
         }
     };
-
 
     chartCandle = new ApexCharts(document.querySelector("#chart-candlestick"), optionsCandle);
     chartCandle.render();
