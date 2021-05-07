@@ -54,7 +54,6 @@
                         <li><a class="dropdown-item" href="mercadosIbex.html">Ibex35</a></li>
                     </ul>
                 </li>
-                </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownTrading" role="button" data-bs-toggle="dropdown"
                        aria-expanded="false">
@@ -83,12 +82,8 @@
 
 <div class="container-fluid">
     <div class="row info_superior">
-        <div class="col-2">
-            <p id="nombreEmpresa">Santander/EUR</p>
-        </div>
-        <div class="col-2 info_superior__align">
-            <p class="fs-5 info_superior__title">Precio actual</p>
-            <p class="fs-6 info_superior__text" id="precioActual">232€</p>
+        <div class="col-3">
+            <p id="nombreEmpresa" class="fs-5 info_superior__title">Santander/EUR</p>
         </div>
         <div class="col-2 info_superior__align">
             <p class="fs-5 info_superior__title">24h cambio</p>
@@ -110,7 +105,8 @@
 </div>
 
 <div class="row">
-    <div class="col-12 col-lg-3 d-node d-lg-flex order_book"></div>
+    <div class="col-12 col-lg-3 d-node d-lg-flex order_book">
+    </div>
     <div class="col-12 col-lg-6">
         <div class="row">
             <div class="col">
@@ -179,9 +175,48 @@
             </div>
         </div>
     </div>
-</div>
-</div>
+    <div class="col-12 col-lg-3 d-node d-lg-flex order_book">
+        <div class="col compra_venta">
+            <div class="col-6 offset-3 d-flex justify-content-center" style="min-height:170px">
+                <div class="tab-content" id="pills-tabContent">
+                    <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                        <div class="css-vurnku">
+                            <div class="css-1ruuqxh">
+                                <div class="css-1ch6ma5">
+                                    <div class="bn-input-prefix css-vurnku">
+                                        <label data-bn-type="text" for="FormRow-BUY-price1" class="css-ef8yc4"
+                                               style="display: inline-block; text-align: right">Precio</label>
+                                    </div>
+                                    <input data-bn-type="input" id="FormRow-BUY-price1" name="price" class="css-1wlt96c" type="number"
+                                           min="0.01" step="0.01" value="423.33" />
+                                    <div class="bn-input-suffix css-vurnku">
+                                        <label data-bn-type="text" for="FormRow-BUY-price1" class="css-ef8yc4"
+                                               style="display: inline-block; text-align: right">EUR</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="css-1ruuqxh">
+                                <div class="css-1ch6ma5">
+                                    <div class="bn-input-prefix css-vurnku">
+                                        <label data-bn-type="text" for="FormRow-BUY-quantity1" class="css-ef8yc4"
+                                               style="display: inline-block; text-align: right">Cantidad</label>
+                                    </div>
+                                    <input data-bn-type="input" id="FormRow-BUY-quantity1" name="quantity" class="css-1wlt96c"
+                                           type="number" min="0.100" step="0.100" value="" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 offset-3 d-flex justify-content-center" style="margin-top: -7%">
+                <button type="button" class="btn btn-success">Comprar</button>
+                <button type="button" class="btn btn-danger ms-2">Vender</button>
+            </div>
+        </div>
+    </div>
 
+</div>
 
 <script src="./js/empresa.js"></script>
 </body>

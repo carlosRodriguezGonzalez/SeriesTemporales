@@ -1,16 +1,22 @@
 let empresa;
 let nombre;
+
 let dateIndex;
 let openIndex;
 let closeIndex;
 let highIndex;
 let lowIndex;
 let volumeIndex;
-let cciIndex;
+let smaIndex;
+
 let dataValues;
 const dataLine = [];
 const dataCandle = [];
 const dataVolume = [];
+const dataSMA = [];
+
+var chartCandle;
+var optionsCandle;
 
 const init = async function() {
     empresa = localStorage.getItem("ticker");
@@ -25,96 +31,108 @@ const init = async function() {
     let btn_60d = document.getElementById("btn_60d");
     let btn_90d = document.getElementById("btn_90d");
 
-        btn_1d.addEventListener('click', function (){
-            let minData = setMaxDatos(1);
-            formatData(minData);
-            renderChart(minData);
-        });
-        btn_5d.addEventListener('click', function (){
-            let minData = setMaxDatos(5);
-            formatData(minData);
-            renderChart(minData);
+    btn_1d.addEventListener('click', function (){
+        let minData = setMaxDatos(1);
+        formatData(minData);
+        renderChart(minData);
+    });
+    btn_5d.addEventListener('click', function (){
+        let minData = setMaxDatos(5);
+        formatData(minData);
+        renderChart(minData);
 
-        });
-        btn_14d.addEventListener('click', function (){
-            let minData = setMaxDatos(14);
-            formatData(minData);
-            renderChart(minData);
+    });
+    btn_14d.addEventListener('click', function (){
+        let minData = setMaxDatos(14);
+        formatData(minData);
+        renderChart(minData);
 
-        });
-        btn_30d.addEventListener('click', function (){
-            let minData = setMaxDatos(30);
-            formatData(minData);
-            renderChart(minData);
+    });
+    btn_30d.addEventListener('click', function (){
+        let minData = setMaxDatos(30);
+        formatData(minData);
+        renderChart(minData);
 
-        });
-        btn_60d.addEventListener('click', function (){
-            let minData = setMaxDatos(60);
-            formatData(minData);
-            renderChart(minData);
+    });
+    btn_60d.addEventListener('click', function (){
+        let minData = setMaxDatos(60);
+        formatData(minData);
+        renderChart(minData);
 
-        });
-        btn_90d.addEventListener('click', function (){
-            let minData = setMaxDatos(90);
-            formatData(minData);
-            renderChart(minData);
+    });
+    btn_90d.addEventListener('click', function (){
+        let minData = setMaxDatos(90);
+        formatData(minData);
+        renderChart(minData);
 
-        });
+    });
 
     await getData();
 }
 
 const setValoresInicio = (data) => {
 
-const headers = data.shift();
+    const headers = data.shift();
 
-dateIndex = headers.findIndex((x) => x === "Date");
-openIndex = headers.findIndex((x) => x === "open");
-closeIndex = headers.findIndex((x) => x === "close");
-highIndex = headers.findIndex((x) => x === "high");
-lowIndex = headers.findIndex((x) => x === "low");
-volumeIndex = headers.findIndex((x) => x === "volume");
-cciIndex = headers.findIndex((x) => x === "cci");
+    dateIndex = headers.findIndex((x) => x === "Date");
+    openIndex = headers.findIndex((x) => x === "open");
+    closeIndex = headers.findIndex((x) => x === "close");
+    highIndex = headers.findIndex((x) => x === "high");
+    lowIndex = headers.findIndex((x) => x === "low");
+    volumeIndex = headers.findIndex((x) => x === "volume");
+    smaIndex = headers.findIndex((x) => x === "open_2_sma");
 
-let precioMaximo = redondear(parseFloat(data[data.length-1][highIndex]),3);
-let precioMinimo = redondear(parseFloat(data[data.length-1][lowIndex]),3);
-let volumen = redondear(parseFloat(data[data.length-1][volumeIndex]),3);
-let precioCambioRaw = redondear(parseFloat(data[data.length-1][openIndex]),5) - redondear(parseFloat(data[data.length-1][closeIndex]),5);
-let precioCambio = redondear(precioCambioRaw,4)
-
-
-console.log("precios del dia " + data[data.length-1][dateIndex]);
-document.getElementById("precioMaximo").innerHTML = precioMaximo;
-document.getElementById("precioMinimo").innerHTML = precioMinimo;
-document.getElementById("volumen").innerHTML = volumen;
+    let precioMaximo = redondear(parseFloat(data[data.length-1][highIndex]),3);
+    let precioMinimo = redondear(parseFloat(data[data.length-1][lowIndex]),3);
+    let volumen = redondear(parseFloat(data[data.length-1][volumeIndex]),3);
+    let precioCambioRaw = redondear(parseFloat(data[data.length-1][closeIndex]),5) - redondear(parseFloat(data[data.length-1][openIndex]),5);
+    let precioCambio = redondear(precioCambioRaw,4);
+    let precioCompra = redondear(parseFloat(data[data.length-1][closeIndex]),2);
 
 
-document.getElementById("precioCambio").innerHTML = precioCambio;
+    console.log("precios del dia " + data[data.length-1][dateIndex]);
+    document.getElementById("precioMaximo").innerHTML = precioMaximo;
+    document.getElementById("precioMinimo").innerHTML = precioMinimo;
+    document.getElementById("volumen").innerHTML = volumen;
+    document.getElementById("precioCambio").innerHTML = precioCambio;
+    document.getElementById("FormRow-BUY-price1").value = precioCompra;
 
-(precioCambio > 0) ? document.getElementById("precioCambio").style.color = "green" : document.getElementById("precioCambio").style.color = "red";
+    (precioCambio > 0) ? document.getElementById("precioCambio").style.color = "green" : document.getElementById("precioCambio").style.color = "red";
+
 }
 
 const formatData = (data) =>{
 
     dataVolume.length = 0;
     dataCandle.length = 0;
+    dataSMA.length = 0;
+    dataLine.length = 0;
 
-    data.forEach((x) => {
+    data.forEach((x,index) => {
+        if (index === 0) return;
         //
         const tempLine = {};
         tempLine.x = new Date(x[dateIndex]).getTime();
         tempLine.y = [redondear(x[closeIndex],3)];
+
         const tempCandle = {};
         tempCandle.x = new Date(x[dateIndex]).getTime();
-        tempCandle.y = [redondear(x[openIndex],3), redondear(x[highIndex],3), redondear(x[lowIndex],3), redondear(x[closeIndex],3)];
+        tempCandle.y = [+redondear(x[openIndex],3), +redondear(x[highIndex],3), +redondear(x[lowIndex],3), +redondear(x[closeIndex],3)];
 
         const tempVolume = {};
         tempVolume.x = new Date(x[dateIndex]).getTime();
         tempVolume.y = [redondear(x[volumeIndex],3)];
-        dataVolume.push(tempVolume);
+
+        const tempSMA = {};
+        tempSMA.x = new Date(x[dateIndex]).getTime();
+        tempSMA.y = +redondear(x[smaIndex],3);
+
 
         dataLine.push(tempLine);
         dataCandle.push(tempCandle);
+        dataVolume.push(tempVolume);
+        dataSMA.push(tempSMA)
+
     });
 }
 
@@ -123,137 +141,160 @@ const renderChart = (data) => {
     let xMin;
     let xMax;
 
-    var optionsCandle = {
-       series: [
-       {
-           data: dataCandle,
-       },
-    ],
-       chart: {
-       type: "candlestick",
-           height: 300,
-           id: "candles",
-           toolbar: {
-               show: true,
-               offsetX: 0,
-               offsetY: 0,
-               tools: {
-                   download: true,
-                   selection: true,
-                   zoom: true,
-                   zoomin: true,
-                   zoomout: true,
-                   pan: true,
-                   reset: true,
-                   customIcons: []
-               },
-               export: {
-                   csv: {
-                       filename: undefined,
-                       columnDelimiter: ',',
-                       headerCategory: 'category',
-                       headerValue: 'value',
-                       dateFormatter(timestamp) {
-                           return new Date(timestamp).toDateString()
-                       }
-                   },
-                   svg: {
-                       filename: undefined,
-                   },
-                   png: {
-                       filename: undefined,
-                   }
-               },
-               autoSelected: 'zoom'
-           },
-    },
-    plotOptions: {
-       candlestick: {
-           colors: {
-               upward: "#02c076",
-                   downward: "#f84960",
-           },
-       },
-    },
-    xaxis: {
-       type: "datetime",
-    },
+    // TODO esta grafica muestra la media movil pero habria que configurarla + varios bugs de la libreria, por ahora no se utiliza
+    var optionsCandleIndicator = {
+        series: [{
+            name: 'SMA',
+            type: 'line',
+            data: dataSMA,
+        }, {
+            name: 'Velas',
+            type: 'candlestick',
+            data: dataCandle,
+        }],
+        chart: {
+            height: 350,
+            type: 'line',
+        },
+        tooltip: {
+            shared: true,
+            custom: [function({seriesIndex, dataPointIndex, w}) {
+                return "SMA: " + w.globals.series[seriesIndex][dataPointIndex]
+            }, function({ seriesIndex, dataPointIndex, w }) {
+                var o = w.globals.seriesCandleO[seriesIndex][dataPointIndex]
+                var h = w.globals.seriesCandleH[seriesIndex][dataPointIndex]
+                var l = w.globals.seriesCandleL[seriesIndex][dataPointIndex]
+                var c = w.globals.seriesCandleC[seriesIndex][dataPointIndex]
+                return (
+                    '<div class="arrow_box">' +
+                    "<span>" + "Apertura: " + o + "</span>" +
+                    "<br>" +
+                    "<span>" + "Máximo: " + h + "</span>" +
+                    "<br>" +
+                    "<span>" + "Minimo: " + l + "</span>" +
+                    "<br>" +
+                    "<span>" + "Cierre: " + c + "</span>" +
+                    "</div>"
+                )
+            }]
+        },
+        toolbar: {
+            show: true,
+            offsetX: 0,
+            offsetY: 0,
+            tools: {
+                download: true,
+                selection: true,
+                zoom: true,
+                zoomin: true,
+                zoomout: true,
+                pan: true,
+                reset: true,
+                customIcons: [],
+            },
+            export: {
+                csv: {
+                    filename: undefined,
+                    columnDelimiter: ",",
+                    headerCategory: "category",
+                    headerValue: "value",
+                },
+                svg: {
+                    filename: undefined,
+                },
+                png: {
+                    filename: undefined,
+                },
+            },
+            autoSelected: "zoom",
+        },
+        plotOptions: {
+            candlestick: {
+                colors: {
+                    upward: "#02c076",
+                    downward: "#f84960",
+                },
+            },
+        },
+        stroke: {
+            show: true,
+            curve: 'smooth',
+            lineCap: 'butt',
+            colors: ["#81ADC8"],
+            width: 2,
+            dashArray: 0,
+        },
+        xaxis: {
+            type: 'datetime'
+        }
     };
 
-    var chartCandle = new ApexCharts(document.querySelector("#chart-candlestick"), optionsCandle);
-    chartCandle.render();
+
+    chartCandle.updateSeries([{
+        data: dataCandle
+    }])
 
     xMin = data[0][0];
     xMax = data[data.length-1][0];
 
-    console.log(xMin)
-    console.log(xMax)
-
     var optionsChartBar = {
-       series: [
-           {
-               name: "volume",
-               data: dataVolume,
-           },
-       ],
-       chart: {
-           height: 160,
-           type: "bar",
-           brush: {
-               enabled: false,
-               target: "candles",
-           },
-           selection: {
-               enabled: true,
-               xaxis: {
-                   min: new Date(xMin-1).getTime(),
-                   max: new Date(xMax+1).getTime(),
-               },
-               fill: {
-                   color: "#ccc",
-                   opacity: 0.4,
-               },
-               stroke: {
-                   color: "#0D47A1",
-               },
-           },
-       },
-       dataLabels: {
-           enabled: false,
-       },
-       plotOptions: {
-           bar: {
-               columnWidth: "80%",
-               colors: {
-                   ranges: [
-                       {
-                           from: -1000,
-                           to: 0,
-                           color: "#f84960",
-                       },
-                       {
-                           from: 1,
-                           to: 10000,
-                           color: "#02c076",
-                       },
-                   ],
-               },
-           },
-       },
-       stroke: {
-           width: 0,
-       },
-       xaxis: {
-           type: "datetime",
-           axisBorder: {
-               offsetX: 13,
-           },
-       },
-       yaxis: {
-           labels: {
-               show: false,
-           },
-       },
+        series: [
+            {
+                name: "volume",
+                data: dataVolume,
+            },
+        ],
+        chart: {
+            height: 160,
+            type: "bar",
+            brush: {
+                enabled: false,
+                target: "candles",
+            },
+            selection: {
+                enabled: true,
+                xaxis: {
+                    min: new Date(xMin-1).getTime(),
+                    max: new Date(xMax+1).getTime(),
+                },
+                fill: {
+                    color: "#ccc",
+                    opacity: 0.4,
+                },
+                stroke: {
+                    color: "#0D47A1",
+                },
+            },
+        },
+        dataLabels: {
+            enabled: false,
+        },
+        plotOptions: {
+            bar: {
+                columnWidth: "80%",
+                colors: {
+                    ranges: [{
+                        from: 0,
+                        to: 100000000000000,
+                        color: "#E39C87",
+                    }],
+                },
+            },
+        },
+        stroke: {
+            width: 0,
+        },
+        xaxis: {
+            type: "datetime",
+            axisBorder: {
+                offsetX: 13,
+            },
+        },
+        yaxis: {
+            labels: {
+                show: false,
+            },
+        },
     };
 
     var chartBar = new ApexCharts(document.querySelector("#chart-bar"), optionsChartBar);
@@ -263,9 +304,10 @@ const renderChart = (data) => {
 
 const setMaxDatos = (max) => {
 
-    // max puede ser: 1 dia; 5 dias; 30 dias; 60 dias; 90 dias; 365 dias;
+    // max puede ser: 1 dia; 5 dias; 30 dias; 60 dias; 90 dias; *365 dias;
+
     let data = [];
-    let headers = ["Date","high","low","open","close","volume","cci"];
+    let headers = ["Date","high","low","open","close","volume","open_2_sma"];
     data.push(headers);
 
     let inicio = dataValues.length-1;
@@ -292,9 +334,9 @@ const redondear = (valorRaw, indice) => {
 }
 
 const newEmpresa = () => {
-$.get("http://127.0.0.1:5000/data/"+empresa, function () {
-  getData();
-});
+    $.get("http://127.0.0.1:5000/data/"+empresa, function () {
+        getData();
+    });
 }
 
 const getData = async () => {
@@ -317,5 +359,62 @@ const getData = async () => {
 }
 
 document.addEventListener('DOMContentLoaded', function (){
+    optionsCandle = {
+        series: [],
+        chart: {
+            type: "candlestick",
+            height: 350,
+            id: "candles",
+        },
+        toolbar: {
+            show: true,
+            offsetX: 0,
+            offsetY: 0,
+            tools: {
+                download: true,
+                selection: true,
+                zoom: true,
+                zoomin: true,
+                zoomout: true,
+                pan: true,
+                reset: true,
+                customIcons: [],
+            },
+            export: {
+                csv: {
+                    filename: undefined,
+                    columnDelimiter: ",",
+                    headerCategory: "category",
+                    headerValue: "value",
+                },
+                svg: {
+                    filename: undefined,
+                },
+                png: {
+                    filename: undefined,
+                },
+            },
+            autoSelected: "zoom",
+        },
+        plotOptions: {
+            candlestick: {
+                colors: {
+                    upward: "#02c076",
+                    downward: "#f84960",
+                },
+            },
+        },
+        xaxis: {
+            type: "datetime",
+        },
+        noData: {
+            text: 'Cargando...'
+        }
+    };
+
+
+    chartCandle = new ApexCharts(document.querySelector("#chart-candlestick"), optionsCandle);
+    chartCandle.render();
+
     init();
 });
