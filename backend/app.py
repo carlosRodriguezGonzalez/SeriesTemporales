@@ -42,9 +42,7 @@ def getDataFromEmpresa(empresa):
     df_list = data.values.tolist()
 
     head = list(data.columns)
-    print(df_list[len(df_list)-1][0] + " --  " + str(datetime.datetime.now().strftime("%Y-%m-%d")))
 
-    #currentTime = str(datetime.datetime.now().strftime("%Y-%m-%d"))
     currentTime = str(datetime.datetime.now().strftime("%Y-%m-%d"))
     currentDay = currentTime[8:10]
     print(currentDay)
