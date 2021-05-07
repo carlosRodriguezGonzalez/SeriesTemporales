@@ -12,8 +12,6 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-CORS(app)
-
 sanModel = Model("./data/models/model.h5","./data/SAN.csv")
 
 def cleanFileName(s):
@@ -40,7 +38,7 @@ def getNewBusiness(empresa):
 
 @app.route('/empresas/<empresa>')
 def getDataFromEmpresa(empresa):
-    fields = ['Date', "high", "low", "open", "close", "volume", "cci"]
+    fields = ['Date', "high", "low", "open", "close", "volume", "open_2_sma"]
 
     data = pd.read_csv(f'data/{empresa}.csv', usecols=fields)
 
