@@ -105,12 +105,18 @@
 </div>
 
 <div class="row">
-    <div class="col-12 col-lg-3 d-node d-lg-flex order_book">
+    <div class="col-12 col-lg-3 d-node d-lg-flex order_book justify-content-center" >
+        <div class="row">
+            <a onclick="prediction()" class="btn btn-primary" id="btn_san" style="height: 5%;margin-top: 5%">Predecir</a>
+        </div>
+        <div class="row" id="predictionDiv">
+
+        </div>
     </div>
     <div class="col-12 col-lg-6">
         <div class="row">
-            <div class="col-12" align="center">
-                <div class="svg-wrapper" style="margin-top: 5%">
+            <div class="col-12" align="center" style="margin-top: 2%">
+                <div class="svg-wrapper">
                     <svg height="20" width="75" xmlns="http://www.w3.org/2000/svg">
                         <rect id="shape" height="40" width="150" />
                         <div id="text">

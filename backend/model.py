@@ -80,10 +80,12 @@ class Model:
         real = np.array(z)
         v = np.copy(z)
         a = np.array(a).squeeze()
-        a = np.concatenate((v[:-atras,-1:],a[:,-1:]))
+        # a = (a * (maximos - minimos)) + media
+        a = np.concatenate((v[:,-1:],a[:,-1:]))
         # plt.plot(real[:,-1:], color = "green")
-        # plt.plot(a, color = "red") 
-        return y
+        # plt.plot(a, color = "red")
 
-    def getPrediction(self, dias):
-        return self.predecir(self.data, dias_a_predecir=dias)
+        return a
+
+    def getPrediction(self, dias,data):
+        return self.predecir(data, dias_a_predecir=dias)

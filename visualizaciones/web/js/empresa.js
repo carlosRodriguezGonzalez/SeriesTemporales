@@ -16,6 +16,7 @@ const dataVolume = [];
 const dataSMA = [];
 
 var chartCandle;
+var chartLine;
 var optionsCandle;
 
 const init = async function() {
@@ -67,17 +68,17 @@ const init = async function() {
     btn_1a.addEventListener('click', function (){
         let minData = setMaxDatos(365);
         formatData(minData);
-        renderLine();
+        renderLine(dataLine);
     });
     btn_5a.addEventListener('click', function (){
         let minData = setMaxDatos(1826);
         formatData(minData);
-        renderLine();
+        renderLine(dataLine);
     });
     btn_max.addEventListener('click', function (){
         let minData = setMaxDatos(0);
         formatData(minData);
-        renderLine();
+        renderLine(dataLine);
     });
 
     await getData();
@@ -149,18 +150,48 @@ const formatData = (data) =>{
     });
 }
 
-const renderLine = () => {
+const formatPrediction = (data) => {
+
+    let sum = 1;
+
+    document.getElementById("chart-bar").hidden = true;
+    const line = [];
+    let tempLine = {};
+
+    data.forEach((x,index) => {
+        if(index != data.length-1){
+            console.log(index);
+            tempLine.x = new Date(dataValues[dateIndex][index]).getTime();
+        } else {
+            console.log(index);
+            var day = new Date();
+            day.setDate(day.getDate() + sum);
+            tempLine.x = day;
+            sum = sum + 1;
+        }
+        tempLine.y = [redondear(x,3)];
+    });
+
+    line.push(tempLine);
+    console.log(line);
+
+    return line
+}
+
+const renderLine = (data) => {
 
     let chartOld = document.getElementById("chart-candlestick");
     let chartNew = document.getElementById("chart-line");
     chartOld.hidden = true;
     chartNew.hidden = false;
+    document.getElementById("chart-bar").hidden = false;
+
 
 
     var optionsLine = {
         series: [
             {
-                data: dataLine,
+                data: data,
             },
         ],
         chart: {
@@ -187,7 +218,7 @@ const renderLine = () => {
         },
     };
 
-    var chartLine = new ApexCharts(document.querySelector("#chart-line"), optionsLine);
+    chartLine = new ApexCharts(document.querySelector("#chart-line"), optionsLine);
     chartLine.render();
 }
 
@@ -196,6 +227,7 @@ const renderChart = (data) => {
     let chartNew = document.getElementById("chart-candlestick");
     chartOld.hidden = true;
     chartNew.hidden = false;
+    document.getElementById("chart-bar").hidden = false;
 
 
     let xMin;
@@ -365,7 +397,7 @@ const renderChart = (data) => {
 
 const setMaxDatos = (max) => {
 
-    // max puede ser: 1 dia; 5 dias; 30 dias; 60 dias; 90 dias; *365 dias;
+    // max puede ser: 1 dia; 5 dias; 30 dias; 60 dias; 90 dias; 365 dias; 1826; 0(historico completo)
     let data = [];
     let headers = ["Date","high","low","open","close","volume","open_2_sma"];
     data.push(headers);
@@ -408,6 +440,7 @@ const getData = async () => {
         type: "GET",
         success: function(data){
             dataValues = data;
+            console.log(data.length)
             let minData = setMaxDatos(30);
             setValoresInicio(dataValues);
             formatData(minData);
@@ -419,6 +452,24 @@ const getData = async () => {
             }
         }
     })
+}
+
+const prediction = () => {
+    $.get("http://127.0.0.1:5000/pruebi", function (data){
+        //let predictionData = formatPrediction(data);
+        //renderLine(predictionData);
+        let div = document.getElementById("predictionDiv");
+        let p = document.createElement("p")
+       if (data[data.length-1][0] < 0){
+           p.innerHTML = "La tendencia a 100 dias es bajista";
+           p.style.color = "red";
+       }else {
+           p.innerHTML = "La tendencia a 100 dias es alcista";
+           p.style.color = "green";
+       }
+       div.appendChild(p);
+       document.getElementById("btn_san").hidden= true;
+    });
 }
 
 document.addEventListener('DOMContentLoaded', function (){
