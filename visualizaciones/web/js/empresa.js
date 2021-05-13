@@ -24,6 +24,10 @@ const init = async function() {
     nombre = localStorage.getItem("nombreEmpresa")
     document.getElementById("nombreEmpresa").innerHTML = nombre;
 
+    if(nombre != "Banco Santander, S.A. (SAN)") {
+        document.getElementById("btn_san").hidden = true;
+    }
+
 
     let btn_1d = document.getElementById("btn_1d");
     let btn_5d = document.getElementById("btn_5d");
@@ -456,6 +460,7 @@ const getData = async () => {
 
 const prediction = () => {
     $.get("http://127.0.0.1:5000/pruebi", function (data){
+        console.log(data);
         //let predictionData = formatPrediction(data);
         //renderLine(predictionData);
         let div = document.getElementById("predictionDiv");
