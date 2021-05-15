@@ -105,12 +105,14 @@
 </div>
 
 <div class="row">
-    <div class="col-12 col-lg-3 d-node d-lg-flex order_book justify-content-center" >
+    <div class="col">
         <div class="row">
-            <a onclick="prediction()" class="btn btn-primary" id="btn_san" style="height: 5%;margin-top: 5%">Predecir</a>
-        </div>
-        <div class="row" id="predictionDiv">
-
+            <div class="col">
+                <input type="number" class="form-control" min="1" id="diasPredecir" placeholder="Dias a predecir" style="margin: 5%">
+            </div>
+            <div class="col">
+                <a onclick="prediction()" class="btn btn-primary" id="btn_san" style="margin: 5%">Predecir</a>
+            </div>
         </div>
     </div>
     <div class="col-12 col-lg-6">

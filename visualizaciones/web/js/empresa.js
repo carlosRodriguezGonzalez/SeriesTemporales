@@ -113,7 +113,7 @@ const setValoresInicio = (data) => {
     document.getElementById("precioMinimo").innerHTML = precioMinimo;
     document.getElementById("volumen").innerHTML = volumen;
     document.getElementById("precioCambio").innerHTML = precioCambio;
-    document.getElementById("FormRow-BUY-price1").value = precioCompra;
+    document.getElementById("FormRow-BUY-price1").value = parseFloat(precioCompra)*10;
 
     (precioCambio > 0) ? document.getElementById("precioCambio").style.color = "green" : document.getElementById("precioCambio").style.color = "red";
 
@@ -150,35 +150,40 @@ const formatData = (data) =>{
         dataCandle.push(tempCandle);
         dataVolume.push(tempVolume);
         dataSMA.push(tempSMA)
-
     });
+}
+function addDays(date, days) {
+    var result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
 }
 
 const formatPrediction = (data) => {
-
-    let sum = 1;
-
     document.getElementById("chart-bar").hidden = true;
     const line = [];
-    let tempLine = {};
+    let sum = 1;
+    let slicedData = data.slice(dataValues.length-1,data.length-1);
 
-    data.forEach((x,index) => {
-        if(index != data.length-1){
-            console.log(index);
-            tempLine.x = new Date(dataValues[dateIndex][index]).getTime();
-        } else {
-            console.log(index);
-            var day = new Date();
-            day.setDate(day.getDate() + sum);
-            tempLine.x = day;
+    let lastDay = new Date(dataValues[dataValues.length-1][dateIndex]);
+
+    slicedData.forEach((x,index) => {
+
+        let tempLine = {};
+
+        if(index === 0){
+            tempLine.x = lastDay.getTime();
+            tempLine.y = redondear(dataValues[dataValues.length-1][closeIndex],3);
+        }else{
+            tempLine.x = addDays(lastDay,sum).getTime();
             sum = sum + 1;
+            let temp = redondear(x[0],3);
+            tempLine.y =  parseFloat(temp) + 1.0;
         }
-        tempLine.y = [redondear(x,3)];
+
+        line.push(tempLine);
     });
 
-    line.push(tempLine);
     console.log(line);
-
     return line
 }
 
@@ -459,21 +464,11 @@ const getData = async () => {
 }
 
 const prediction = () => {
-    $.get("http://127.0.0.1:5000/pruebi", function (data){
+    let dias = document.getElementById("diasPredecir").value;
+    $.get("http://127.0.0.1:5000/pruebi/"+dias, function (data){
         console.log(data);
-        //let predictionData = formatPrediction(data);
-        //renderLine(predictionData);
-        let div = document.getElementById("predictionDiv");
-        let p = document.createElement("p")
-       if (data[data.length-1][0] < 0){
-           p.innerHTML = "La tendencia a 100 dias es bajista";
-           p.style.color = "red";
-       }else {
-           p.innerHTML = "La tendencia a 100 dias es alcista";
-           p.style.color = "green";
-       }
-       div.appendChild(p);
-       document.getElementById("btn_san").hidden= true;
+        let predictionData = formatPrediction(data);
+        renderLine(predictionData);
     });
 }
 
