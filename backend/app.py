@@ -57,11 +57,11 @@ def getDataFromEmpresa(empresa):
 
     # hay que sacar los findes de semana --> problema para los dias de fiesta en general es un problema lo de tenerlos actualizados
     # por ahora depende de que el cliente acceda a la empresa para que se actualicen
-    if currentDay != dfDay:
-        print(f'descargando nueva version de {empresa}')
-        os.remove(f'data/{empresa}.csv')
-        getNewBusiness(empresa)
-        return
+    #if currentDay != dfDay:
+     #   print(f'descargando nueva version de {empresa}')
+      #  os.remove(f'data/{empresa}.csv')
+       # getNewBusiness(empresa)
+        #return
 
 
     df_list.insert(0, head)
@@ -81,8 +81,8 @@ def getDataFromEmpresaCSV(empresa):
         headers={"Content-disposition":
                  "attachment; filename=data.csv"})
 
-@app.route('/pruebi')
-def makePrediction():
+@app.route('/pruebi/<dias>')
+def makePrediction(dias):
     data = pd.read_csv("./data/SAN.csv",index_col='Date', parse_dates=['Date'])
-    return jsonify(sanModel.getPrediction(100,data).tolist())
+    return jsonify(sanModel.getPrediction(int(dias),data).tolist())
 
