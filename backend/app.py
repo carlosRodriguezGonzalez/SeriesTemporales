@@ -71,7 +71,7 @@ def getDataFromEmpresa(empresa):
 
 @app.route('/empresas/<empresa>/CSV')
 def getDataFromEmpresaCSV(empresa):
-    fields = ['Date', "high", "low", "open", "close", "volume"]
+    fields = ['Date', "high", "low", "open", "close", "volume","close_50_sma","kdjk","rsi_6","cci","dma","tr","pdi","volume_delta","trix","wr_6"]
 
     data = pd.read_csv(f'data/{empresa}.csv', usecols=fields)
 

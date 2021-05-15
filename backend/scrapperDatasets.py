@@ -36,7 +36,8 @@ class scrapperDatasets:
         stock.get('pdi') # momentum indicator used by technical traders that shows the percentage change in a triple exponentially smoothed moving average
         stock.get('trix')
         stock.get('vr')  # volatility ratio
-        stock.get('open_2_sma') # media movil
+        stock.get('close_50_sma') # media movil
+
 
         return stock
 
