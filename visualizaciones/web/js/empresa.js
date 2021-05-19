@@ -34,6 +34,8 @@ const dataTrix = [];
 const dataWR = [];
 
 var chartCandle;
+var chartBar;
+var optionsChartBar;
 var chartLine;
 var optionsCandle;
 var smaChart;
@@ -77,33 +79,64 @@ const init = async function() {
     let btn_1a = document.getElementById("btn_1a");
     let btn_5a = document.getElementById("btn_5a");
     let btn_max = document.getElementById("btn_max");
+
     btn_1d.addEventListener('click', function (){
+        chartCandle.updateOptions({
+            title: {
+                text: "Datos de 1 día",
+            },
+        })
         let minData = setMaxDatos(1);
         formatData(minData);
         updateChart(minData);
     });
     btn_5d.addEventListener('click', function (){
+        chartCandle.updateOptions({
+            title: {
+                text: "Datos de 5 días",
+            },
+        })
         let minData = setMaxDatos(5);
         formatData(minData);
         updateChart(minData);
 
     });
     btn_14d.addEventListener('click', function (){
+        chartCandle.updateOptions({
+            title: {
+                text: "Datos de 14 días",
+            },
+        })
         let minData = setMaxDatos(14);
         formatData(minData);
         updateChart(minData);
     });
     btn_30d.addEventListener('click', function (){
+        chartCandle.updateOptions({
+            title: {
+                text: "Datos de 30 días",
+            },
+        })
         let minData = setMaxDatos(30);
         formatData(minData);
         updateChart(minData);
     });
     btn_60d.addEventListener('click', function (){
+        chartCandle.updateOptions({
+            title: {
+                text: "Datos a 60 días",
+            },
+        })
         let minData = setMaxDatos(60);
         formatData(minData);
         updateChart(minData);
     });
     btn_90d.addEventListener('click', function (){
+        chartCandle.updateOptions({
+            title: {
+                text: "Datos de 90 días",
+            },
+        })
         let minData = setMaxDatos(90);
         formatData(minData);
         updateChart(minData);
@@ -111,17 +144,17 @@ const init = async function() {
     btn_1a.addEventListener('click', function (){
         let minData = setMaxDatos(365);
         formatData(minData);
-        renderLine(dataLine);
+        renderLine(dataLine,0,1);
     });
     btn_5a.addEventListener('click', function (){
         let minData = setMaxDatos(1826);
         formatData(minData);
-        renderLine(dataLine);
+        renderLine(dataLine,0,2);
     });
     btn_max.addEventListener('click', function (){
         let minData = setMaxDatos(0);
         formatData(minData);
-        renderLine(dataLine);
+        renderLine(dataLine,0,3);
     });
 
     await getData();
@@ -256,7 +289,8 @@ const formatData = (data) =>{
 }
 
 const formatPrediction = (data) => {
-    document.getElementById("chart-bar").hidden = true;
+    document.getElementById("chart-bar").style.display = "none";
+
     const line = [];
     let sum = 1;
     let slicedData = data.slice(dataValues.length-1,data.length-1);
@@ -284,48 +318,138 @@ const formatPrediction = (data) => {
     return line
 }
 
-const renderLine = (data) => {
+const renderLine = (data,p= 0,d=0) => {
 
     let chartOld = document.getElementById("chart-candlestick");
     let chartNew = document.getElementById("chart-line");
     chartOld.hidden = true;
     chartNew.hidden = false;
-    document.getElementById("chart-bar").hidden = false;
 
+    if(p != 0){
 
+        var optionsLine = {
+            series: [
+                {
+                    data: data,
+                },
+            ],
+            chart: {
+                animations: {
+                    enabled: false,
+                },
+            },
+            title: {
+                text: "Prediccion a " + document.getElementById("diasPredecir").value + " días",
+                align: 'left',
+                margin: 10,
+                offsetX: 0,
+                offsetY: 0,
+                floating: false,
+                style: {
+                    fontSize:  '18px',
+                    fontWeight:  'bold',
+                    fontFamily:  undefined,
+                    color:  '#263238'
+                },
+            },
+            xaxis: {
+                type: "datetime",
+            },
+            tooltip: {
+                shared: true,
+                custom: function ({seriesIndex, dataPointIndex, w}) {
+                    return (
+                        '<div class="arrow_box">' +
+                        "<span>" + "Cierre: " + w.globals.series[seriesIndex][dataPointIndex] + "</span>" +
+                        "</div>"
+                    )
+                },
+            },
+            stroke: {
+                width: 1.25,
+                colors: ["#f00"],
+            },
+        };
 
-    var optionsLine = {
-        series: [
-            {
-                data: data,
+    }else{
+        document.getElementById("chart-bar").hidden = false;
+        var optionsLine = {
+            series: [
+                {
+                    data: data,
+                },
+            ],
+            chart: {
+                animations: {
+                    enabled: false,
+                },
             },
-        ],
-        chart: {
-            animations: {
-                enabled: false,
+            title: {
+                text: undefined,
+                align: 'left',
+                margin: 10,
+                offsetX: 0,
+                offsetY: 0,
+                floating: false,
+                style: {
+                    fontSize:  '18px',
+                    fontWeight:  'bold',
+                    fontFamily:  undefined,
+                    color:  '#263238'
+                },
             },
-        },
-        xaxis: {
-            type: "datetime",
-        },
-        tooltip: {
-            shared: true,
-            custom: function ({seriesIndex, dataPointIndex, w}) {
-                return (
-                    '<div class="arrow_box">' +
-                    "<span>" + "Cierre: " + w.globals.series[seriesIndex][dataPointIndex] + "</span>" +
-                    "</div>"
-                )
+            xaxis: {
+                type: "datetime",
             },
-        },
-        stroke: {
-            width: 1.25,
-            colors: ["#f00"],
-        },
-    };
+            tooltip: {
+                shared: true,
+                custom: function ({seriesIndex, dataPointIndex, w}) {
+                    return (
+                        '<div class="arrow_box">' +
+                        "<span>" + "Cierre: " + w.globals.series[seriesIndex][dataPointIndex] + "</span>" +
+                        "</div>"
+                    )
+                },
+            },
+            stroke: {
+                width: 1.25,
+                colors: ["#f00"],
+            },
+        };
+    }
+
 
     chartLine = new ApexCharts(document.querySelector("#chart-line"), optionsLine);
     chartLine.render();
+    if(d != 0){
+        switch (d){
+            case 1: {
+                chartLine.updateOptions({
+                    title:{
+                        text: "Datos de 1 año"
+                    }
+                })
+                break;
+            }
+            case 2: {
+                chartLine.updateOptions({
+                    title:{
+                        text: "Datos de 5 años"
+                    }
+                })
+                break;
+            }
+            case 3: {
+                chartLine.updateOptions({
+                    title:{
+                        text: "Datos historicos"
+                    }
+                })
+                break;
+            }
+
+        }
+    }
 }
 
 const updateChart = (data) => {
@@ -334,7 +458,7 @@ const updateChart = (data) => {
     let chartNew = document.getElementById("chart-candlestick");
     chartOld.hidden = true;
     chartNew.hidden = false;
-    document.getElementById("chart-bar").hidden = false;
+    document.getElementById("chart-bar").style.display = "flex";
 
     chartCandle.updateSeries([{
         data: dataCandle
@@ -373,69 +497,19 @@ const updateChart = (data) => {
     xMin = data[0][0];
     xMax = data[data.length-1][0];
 
-    var optionsChartBar = {
-        series: [
-            {
-                name: "volume",
-                data: dataVolume,
-            },
-        ],
-        chart: {
-            height: 160,
-            type: "bar",
-            brush: {
-                enabled: false,
-                target: "candles",
-            },
-            selection: {
-                enabled: true,
-                xaxis: {
-                    min: new Date(xMin-1).getTime(),
-                    max: new Date(xMax+1).getTime(),
-                },
-                fill: {
-                    color: "#ccc",
-                    opacity: 0.4,
-                },
-                stroke: {
-                    color: "#0D47A1",
-                },
-            },
-        },
-        dataLabels: {
-            enabled: false,
-        },
-        plotOptions: {
-            bar: {
-                columnWidth: "80%",
-                colors: {
-                    ranges: [{
-                        from: 0,
-                        to: 100000000000000,
-                        color: "#E39C87",
-                    }],
-                },
-            },
-        },
-        stroke: {
-            width: 0,
-        },
+    ApexCharts.exec('chartBar', 'updateOptions', {
         xaxis: {
-            type: "datetime",
-            axisBorder: {
-                offsetX: 13,
-            },
+            min: new Date(xMin-1).getTime(),
+            max: new Date(xMax+1).getTime(),
         },
-        yaxis: {
-            labels: {
-                show: false,
-            },
-        },
-    };
+    }, false, true);
 
-    var chartBar = new ApexCharts(document.querySelector("#chart-bar"), optionsChartBar);
+
+    ApexCharts.exec('chartBar', 'updateSeries', [{
+        data: dataVolume
+    }], true);
+
     chartBar.render();
-
 }
 
 const renderIndicators = (data) => {
@@ -444,6 +518,7 @@ const renderIndicators = (data) => {
     let xMax;
     xMin = data[0][0];
     xMax = data[data.length-1][0];
+
 
     optionsSma = {
                 series: [{
@@ -1008,7 +1083,7 @@ const renderIndicators = (data) => {
     };
     wrBar = new ApexCharts(document.querySelector("#chart-wr"), optionsWr);
     wrBar.render();
-
+4
 }
 
 const setMaxDatos = (max) => {
@@ -1062,11 +1137,13 @@ const getData = async () => {
 }
 
 const prediction = () => {
+    openModal();
     let dias = document.getElementById("diasPredecir").value;
     $.get("http://127.0.0.1:5000/pruebi/"+dias, function (data){
         console.log(data);
         let predictionData = formatPrediction(data);
-        renderLine(predictionData);
+        renderLine(predictionData,1);
+        closeModal();
     });
 }
 
@@ -1107,6 +1184,15 @@ const redondear = (valorRaw, indice) => {
     return valor;
 }
 
+function openModal() {
+    document.getElementById('modal').style.display = 'block';
+    document.getElementById('fade').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+    document.getElementById('fade').style.display = 'none';
+}
 
 
 document.addEventListener('DOMContentLoaded', function (){
@@ -1117,6 +1203,20 @@ document.addEventListener('DOMContentLoaded', function (){
             type: "candlestick",
             height: 350,
             id: "candles",
+        },
+        title: {
+            text: "Prediccion a 30 días",
+            align: 'left',
+            margin: 10,
+            offsetX: 0,
+            offsetY: 0,
+            floating: false,
+            style: {
+                fontSize:  '18px',
+                fontWeight:  'bold',
+                fontFamily:  undefined,
+                color:  '#263238'
+            },
         },
         toolbar: {
             show: true,
@@ -1166,6 +1266,65 @@ document.addEventListener('DOMContentLoaded', function (){
 
     chartCandle = new ApexCharts(document.querySelector("#chart-candlestick"), optionsCandle);
     chartCandle.render();
+
+    optionsChartBar = {
+        series: [{
+                name:"volumen",
+                data: [],
+            }
+        ],
+        chart: {
+            id: "chartBar",
+            height: 160,
+            type: "bar",
+            brush: {
+                enabled: false,
+                target: "candles",
+            },
+            selection: {
+                enabled: true,
+                fill: {
+                    color: "#ccc",
+                    opacity: 0.4,
+                },
+                stroke: {
+                    color: "#0D47A1",
+                },
+            },
+        },
+        dataLabels: {
+            enabled: false,
+        },
+        plotOptions: {
+            bar: {
+                columnWidth: "80%",
+                colors: {
+                    ranges: [{
+                        from: 0,
+                        to: 100000000000000,
+                        color: "#E39C87",
+                    }],
+                },
+            },
+        },
+        stroke: {
+            width: 0,
+        },
+        xaxis: {
+            type: "datetime",
+            axisBorder: {
+                offsetX: 13,
+            },
+        },
+        yaxis: {
+            labels: {
+                show: false,
+            },
+        },
+    };
+
+    chartBar = new ApexCharts(document.querySelector("#chart-bar"), optionsChartBar);
+    chartBar.render();
 
     document.getElementById("chart-sma").style.display = "none";
     document.getElementById("chart-dma").style.display = "none";
