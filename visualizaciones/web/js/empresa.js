@@ -1169,7 +1169,7 @@ const showIndicator = (e) => {
             document.getElementById("chart-candlestick").style.display = "flex";
             document.getElementById("chart-candlestick").hidden = false;
         }
-        renderMainChart();
+        renderMainChart(1);
         chart.style.display = "none";
         chart.hidden = true;
     }
@@ -1200,7 +1200,7 @@ function closeModal() {
     document.getElementById('fade').style.display = 'none';
 }
 
-const renderMainChart = () => {
+const renderMainChart = (o) => {
     optionsCandle = {
         series: [],
         chart: {
@@ -1270,6 +1270,12 @@ const renderMainChart = () => {
 
     chartCandle = new ApexCharts(document.querySelector("#chart-candlestick"), optionsCandle);
     chartCandle.render();
+
+    if(o === 1){
+        chartCandle.updateSeries([{
+            data: dataCandle
+        }]);
+    }
 }
 
 
