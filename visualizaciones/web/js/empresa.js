@@ -195,7 +195,7 @@ const setValoresInicio = (data) => {
     document.getElementById("precioMinimo").innerHTML = precioMinimo;
     document.getElementById("volumen").innerHTML = volumen;
     document.getElementById("precioCambio").innerHTML = precioCambio;
-    document.getElementById("FormRow-BUY-price1").value = parseFloat(precioCompra)*10;
+    document.getElementById("FormRow-BUY-price1").value = redondear(parseFloat(precioCompra)*10,2);
 
     (precioCambio > 0) ? document.getElementById("precioCambio").style.color = "green" : document.getElementById("precioCambio").style.color = "red";
 
