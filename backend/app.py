@@ -39,7 +39,7 @@ def getNewBusiness(empresa):
 
 @app.route('/empresas/<empresa>')
 def getDataFromEmpresa(empresa):
-    fields = ['Date', "high", "low", "open", "close", "volume","close_50_sma","kdjk","rsi_6","cci","dma","tr","pdi","volume_delta","trix","wr_6"]
+    fields = ['Date', "high", "low", "open", "close", "volume","close_20_sma","kdjk","rsi_6","cci","dma","tr","pdi","volume_delta","trix","wr_6"]
 
     data = pd.read_csv(f'data/{empresa}.csv', usecols=fields)
 
@@ -53,15 +53,15 @@ def getDataFromEmpresa(empresa):
 
     dfTime = df_list[len(df_list)-1][0]
     dfDay = dfTime[8:10]
-    print(dfDay)
+    print(int(dfDay)+1)
 
     # hay que sacar los findes de semana --> problema para los dias de fiesta en general es un problema lo de tenerlos actualizados
     # por ahora depende de que el cliente acceda a la empresa para que se actualicen
-    #if currentDay != dfDay:
-     #   print(f'descargando nueva version de {empresa}')
-      #  os.remove(f'data/{empresa}.csv')
-       # getNewBusiness(empresa)
-        #return
+    if (currentDay != dfDay) and (int(currentDay) != (int(dfDay)+1)):
+        print(f'descargando nueva version de {empresa}')
+        os.remove(f'data/{empresa}.csv')
+        getNewBusiness(empresa)
+        return
 
 
     df_list.insert(0, head)
@@ -71,7 +71,7 @@ def getDataFromEmpresa(empresa):
 
 @app.route('/empresas/<empresa>/CSV')
 def getDataFromEmpresaCSV(empresa):
-    fields = ['Date', "high", "low", "open", "close", "volume","close_50_sma","kdjk","rsi_6","cci","dma","tr","pdi","volume_delta","trix","wr_6"]
+    fields = ['Date', "high", "low", "open", "close", "volume","close_20_sma","kdjk","rsi_6","cci","dma","tr","pdi","volume_delta","trix","wr_6"]
 
     data = pd.read_csv(f'data/{empresa}.csv', usecols=fields)
 

@@ -65,8 +65,9 @@ const init = async function() {
     nombre = localStorage.getItem("nombreEmpresa")
     document.getElementById("nombreEmpresa").innerHTML = nombre;
 
-    if(nombre != "Banco Santander, S.A. (SAN)") {
+    if(!nombre.includes("Santander")) {
         document.getElementById("btn_san").hidden = true;
+        document.getElementById("diasPredecir").hidden = true;
     }
 
 
@@ -170,7 +171,7 @@ const setValoresInicio = (data) => {
     highIndex = headers.findIndex((x) => x === "high");
     lowIndex = headers.findIndex((x) => x === "low");
     volumeIndex = headers.findIndex((x) => x === "volume");
-    smaIndex = headers.findIndex((x) => x === "close_50_sma");
+    smaIndex = headers.findIndex((x) => x === "close_20_sma");
     dmaIndex = headers.findIndex((x) => x === "dma");
     rsiIndex = headers.findIndex((x) => x === "rsi_6");
     kdjkIndex = headers.findIndex((x) => x === "kdjk");
@@ -184,11 +185,11 @@ const setValoresInicio = (data) => {
     let precioMaximo = redondear(parseFloat(data[data.length-1][highIndex]),3);
     let precioMinimo = redondear(parseFloat(data[data.length-1][lowIndex]),3);
     let volumen = redondear(parseFloat(data[data.length-1][volumeIndex]),3);
-    let precioCambioRaw = redondear(parseFloat(data[data.length-1][closeIndex]),5) - redondear(parseFloat(data[data.length-1][openIndex]),5);
-    let precioCambio = redondear(precioCambioRaw,4);
+    let precioCambioRaw = redondear(parseFloat(data[data.length-1][closeIndex]),2) - redondear(parseFloat(data[data.length-2][closeIndex]),2);
+    let precioCambio = redondear(precioCambioRaw,3);
     let precioCompra = redondear(parseFloat(data[data.length-1][closeIndex]),3);
 
-
+    console.log("precio cambio " + precioCambioRaw)
     console.log("precios del dia " + data[data.length-1][dateIndex]);
     document.getElementById("precioMaximo").innerHTML = precioMaximo;
     document.getElementById("precioMinimo").innerHTML = precioMinimo;
@@ -289,7 +290,10 @@ const formatData = (data) =>{
 }
 
 const formatPrediction = (data) => {
+    console.log(data)
     document.getElementById("chart-bar").style.display = "none";
+    document.getElementById("chart-bar").hidden = true;
+
 
     const line = [];
     let sum = 1;
@@ -308,7 +312,7 @@ const formatPrediction = (data) => {
             tempLine.x = addDays(lastDay,sum).getTime();
             sum = sum + 1;
             let temp = redondear(x[0],3);
-            tempLine.y =  parseFloat(temp) + 1.0;
+            tempLine.y =  parseFloat(temp);
         }
 
         line.push(tempLine);
@@ -323,7 +327,9 @@ const renderLine = (data,p= 0,d=0) => {
     let chartOld = document.getElementById("chart-candlestick");
     let chartNew = document.getElementById("chart-line");
     chartOld.hidden = true;
+    chartOld.style.display = "flex";
     chartNew.hidden = false;
+    chartNew.style.display = "none";
 
     if(p != 0){
 
@@ -373,6 +379,8 @@ const renderLine = (data,p= 0,d=0) => {
 
     }else{
         document.getElementById("chart-bar").hidden = false;
+        document.getElementById("chart-bar").style.display = "flex";
+
         var optionsLine = {
             series: [
                 {
@@ -519,7 +527,6 @@ const renderIndicators = (data) => {
     xMin = data[0][0];
     xMax = data[data.length-1][0];
 
-
     optionsSma = {
                 series: [{
                     name: 'SMA',
@@ -586,20 +593,12 @@ const renderIndicators = (data) => {
                     },
                     autoSelected: "zoom",
                 },
-                plotOptions: {
-                    candlestick: {
-                        colors: {
-                            upward: "#02c076",
-                            downward: "#f84960",
-                        },
-                    },
-                },
                 stroke: {
                     show: true,
                     curve: 'smooth',
                     lineCap: 'butt',
                     colors: ["#81ADC8"],
-                    width: 2,
+                    width: [3,1],
                     dashArray: 0,
                 },
                 xaxis: {
@@ -1090,7 +1089,7 @@ const setMaxDatos = (max) => {
 
     // max puede ser: 1 dia; 5 dias; 30 dias; 60 dias; 90 dias; 365 dias; 1826; 0(historico completo)
     let data = [];
-    let headers = ["Date","high","low","open","close","volume","close_50_sma","dma","rsi_6","kdjk","cci","tr","pdi","volume_delta","trix","wr_6"];
+    let headers = ["Date","high","low","open","close","volume","close_20_sma","dma","rsi_6","kdjk","cci","tr","pdi","volume_delta","trix","wr_6"];
     data.push(headers);
 
     let inicio = dataValues.length-1;
@@ -1156,16 +1155,23 @@ const showIndicator = (e) => {
         if(indicator[0] === "sma"){
             document.getElementById("chart-candlestick").style.display = "none";
             document.getElementById("chart-dma").style.display = "none";
+            document.getElementById("chart-candlestick").hidden = true;
+            document.getElementById("chart-dma").hidden = true;
         }else if(indicator[0] === "dma"){
-            document.getElementById("chart-candlestick").style.display = "none";
-            document.getElementById("chart-sma").style.display = "none";
+            document.getElementById("chart-candlestick").hidden = true;
+            document.getElementById("chart-sma").hidden = true;
         }
         chart.style.display = "flex";
+        chart.hidden = false;
+        chartCandle.destroy();
     }else {
         if(indicator[0] === "sma" || indicator[0] === "dma"){
             document.getElementById("chart-candlestick").style.display = "flex";
+            document.getElementById("chart-candlestick").hidden = false;
         }
+        renderMainChart();
         chart.style.display = "none";
+        chart.hidden = true;
     }
 }
 
@@ -1194,9 +1200,7 @@ function closeModal() {
     document.getElementById('fade').style.display = 'none';
 }
 
-
-document.addEventListener('DOMContentLoaded', function (){
-
+const renderMainChart = () => {
     optionsCandle = {
         series: [],
         chart: {
@@ -1205,7 +1209,7 @@ document.addEventListener('DOMContentLoaded', function (){
             id: "candles",
         },
         title: {
-            text: "Prediccion a 30 días",
+            text: "Datos de 30 días",
             align: 'left',
             margin: 10,
             offsetX: 0,
@@ -1266,6 +1270,12 @@ document.addEventListener('DOMContentLoaded', function (){
 
     chartCandle = new ApexCharts(document.querySelector("#chart-candlestick"), optionsCandle);
     chartCandle.render();
+}
+
+
+document.addEventListener('DOMContentLoaded', function (){
+
+    renderMainChart();
 
     optionsChartBar = {
         series: [{
